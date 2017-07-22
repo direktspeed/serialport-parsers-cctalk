@@ -1,0 +1,40 @@
+{
+  "name": "serialport-parsers-cctalk",
+  "version": "0.0.1",
+  "description": "A ccTalk Message Parser for serialport@^5.0.0",
+  "main": "dist/cctalk.js",
+  "scripts": {
+    "build": "babel -d dist/ src/",
+    "test": "npm run build && mocha --compilers js:babel-core/register",
+    "prepublish": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/direktspeed/serialport-parsers-cctalk.git"
+  },
+  "keywords": [
+    "serialport",
+    "5",
+    "parser",
+    "cctalk",
+    "message"
+  ],
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.24.1",
+    "babel-plugin-transform-decorators-legacy": "^1.3.4",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "class-nonew-decorator": "^1.0.6",
+    "mocha": "^3.4.2"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.23.0"
+  },
+  "author": "Frank Lemanschik <frank@dspeed.eu>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/direktspeed/serialport-parsers-cctalk/issues"
+  },
+  "homepage": "https://github.com/direktspeed/serialport-parsers-cctalk#readme"
+}

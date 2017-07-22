@@ -1,6 +1,6 @@
 {
   "name": "serialport-parsers-cctalk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A ccTalk Message Parser for serialport@^5.0.0",
   "main": "dist/cctalk.js",
   "scripts": {

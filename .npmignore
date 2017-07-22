@@ -1,3 +1,5 @@
+.gitignore
+.git
 .babelrc
 src
 node_modules

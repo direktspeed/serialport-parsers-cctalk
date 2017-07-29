@@ -25,11 +25,11 @@
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "class-nonew-decorator": "^1.0.6",
+    "babel-polyfill": "^6.23.0",
     "mocha": "^3.4.2"
   },
   "dependencies": {
-    "babel-polyfill": "^6.23.0"
+    "class-nonew-decorator": "^1.0.6"
   },
   "author": "Frank Lemanschik <frank@dspeed.eu>",
   "license": "Apache-2.0",

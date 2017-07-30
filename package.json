@@ -5,8 +5,8 @@
   "main": "dist/cctalk.js",
   "scripts": {
     "build": "babel -d dist/ src/",
-    "test": "npm run build && mocha --compilers js:babel-core/register",
-    "prepublish": "npm run test"
+    "test": "mocha --compilers js:babel-core/register",
+    "prepublish": "npm run test && npm run build"
   },
   "repository": {
     "type": "git",

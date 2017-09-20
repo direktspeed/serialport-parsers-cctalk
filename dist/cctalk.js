@@ -17,7 +17,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Buffer = require('safe-buffer').Buffer;
 var Transform = require('stream').Transform;
 var MAX_PACKET_LENGTH = 255 + 5;
-
+var debug = require('debug');
 var nonew = require('class-nonew-decorator');
 
 var ccTalkParser = (_dec = nonew(), _dec(_class = function (_Transform) {
@@ -36,12 +36,12 @@ var ccTalkParser = (_dec = nonew(), _dec(_class = function (_Transform) {
   _createClass(ccTalkParser, [{
     key: '_transform',
     value: function _transform(buffer, _, cb) {
-      debug('parser set', this.buffer, buffer, this.cursor);
-      debug('parser set', this.buffer.toString('hex'), buffer.buffer, this.cursor);
+      debug('parser set')(this.buffer, buffer, this.cursor);
+      debug('parser set')(this.buffer.toString('hex'), buffer.buffer, this.cursor);
 
       this.buffer.set(buffer, this.cursor);
       this.cursor += buffer.length;
-      debug('parse befor loop', buffer, this.cursor);
+      debug('parse befor loop')(buffer, this.cursor);
       while (this.cursor > 1 && this.cursor >= this.buffer[1] + 5) {
         // full frame accumulated
         var length = this.buffer[1] + 5;

@@ -1,43 +1,41 @@
 const Buffer = require('safe-buffer').Buffer;
 const Transform = require('stream').Transform;
-const nonew = require('class-nonew-decorator');
-
 const MAX_PACKET_LENGTH = 255 + 5;
+
+const nonew = require('class-nonew-decorator');
 
 @nonew()
 class ccTalkParser extends Transform {
   constructor() {
-    super();
+    super();  
     this.buffer = Buffer.alloc(MAX_PACKET_LENGTH); // maxium ccTalkMessage length
-    this.ccTalkMessageLength = 5; // minumum ccTalkMessage length
     this.cursor = 0;
   }
-  _transform(data, _, cb) {
-    let dataCursor = 0;
+  _transform(buffer, _, cb) {
+     debug('parser set',this.buffer, buffer ,this.cursor)
+     debug('parser set',this.buffer.toString('hex'), buffer.buffer ,this.cursor)
 
-    // copy data into the buffer until we're out of data
-    while (dataCursor < data.length) {
-      this.buffer[this.cursor] = data[dataCursor];
+     this.buffer.set(buffer, this.cursor);
+     this.cursor += buffer.length;
+     debug('parse befor loop',buffer, this.cursor)
+     while(this.cursor > 1 && this.cursor >= this.buffer[1] + 5) {
+       // full frame accumulated
+       var length = this.buffer[1] + 5;
+       //console.log("length", length);
 
-      // adjust ccTalkMessageLength after getting data.length byte of the ccTalkMessage
-      if (this.cursor === 2) {
-        this.ccTalkMessageLength = data[dataCursor];
-      }
+       //copy command from the buffer
+       var frame = new Uint8Array(length);
+       frame.set(this.buffer.slice(0, length));
 
-      dataCursor++;
-      this.cursor++;
-
-      // detect a finished ccTalkMessage!
-      if (this.cursor >= this.ccTalkMessageLength) {
-        const ccTalkMessage = this.buffer.slice(0, this.ccTalkMessageLength);
-        this.push(ccTalkMessage);
-        this.buffer = Buffer.alloc(MAX_PACKET_LENGTH);
-        this.ccTalkMessageLength = 5;
-        this.cursor = 0;
-      }
+       // copy remaining buffer to the begin of the buffer to prepare for next command
+       this.buffer.set(this.buffer.slice(length, this.cursor));
+       this.cursor -= length;
+       debug('parse push',frame,this.buffer,this.cursor)
+       this.push(frame);
     }
     cb();
   }
 };
+
 export default ccTalkParser;
 module.exports = ccTalkParser;

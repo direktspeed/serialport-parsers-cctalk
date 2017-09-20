@@ -16,9 +16,9 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var Buffer = require('safe-buffer').Buffer;
 var Transform = require('stream').Transform;
-var nonew = require('class-nonew-decorator');
-
 var MAX_PACKET_LENGTH = 255 + 5;
+
+var nonew = require('class-nonew-decorator');
 
 var ccTalkParser = (_dec = nonew(), _dec(_class = function (_Transform) {
   _inherits(ccTalkParser, _Transform);
@@ -29,36 +29,33 @@ var ccTalkParser = (_dec = nonew(), _dec(_class = function (_Transform) {
     var _this = _possibleConstructorReturn(this, (ccTalkParser.__proto__ || Object.getPrototypeOf(ccTalkParser)).call(this));
 
     _this.buffer = Buffer.alloc(MAX_PACKET_LENGTH); // maxium ccTalkMessage length
-    _this.ccTalkMessageLength = 5; // minumum ccTalkMessage length
     _this.cursor = 0;
     return _this;
   }
 
   _createClass(ccTalkParser, [{
     key: '_transform',
-    value: function _transform(data, _, cb) {
-      var dataCursor = 0;
+    value: function _transform(buffer, _, cb) {
+      debug('parser set', this.buffer, buffer, this.cursor);
+      debug('parser set', this.buffer.toString('hex'), buffer.buffer, this.cursor);
 
-      // copy data into the buffer until we're out of data
-      while (dataCursor < data.length) {
-        this.buffer[this.cursor] = data[dataCursor];
+      this.buffer.set(buffer, this.cursor);
+      this.cursor += buffer.length;
+      debug('parse befor loop', buffer, this.cursor);
+      while (this.cursor > 1 && this.cursor >= this.buffer[1] + 5) {
+        // full frame accumulated
+        var length = this.buffer[1] + 5;
+        //console.log("length", length);
 
-        // adjust ccTalkMessageLength after getting data.length byte of the ccTalkMessage
-        if (this.cursor === 2) {
-          this.ccTalkMessageLength = data[dataCursor];
-        }
+        //copy command from the buffer
+        var frame = new Uint8Array(length);
+        frame.set(this.buffer.slice(0, length));
 
-        dataCursor++;
-        this.cursor++;
-
-        // detect a finished ccTalkMessage!
-        if (this.cursor >= this.ccTalkMessageLength) {
-          var ccTalkMessage = this.buffer.slice(0, this.ccTalkMessageLength);
-          this.push(ccTalkMessage);
-          this.buffer = Buffer.alloc(MAX_PACKET_LENGTH);
-          this.ccTalkMessageLength = 5;
-          this.cursor = 0;
-        }
+        // copy remaining buffer to the begin of the buffer to prepare for next command
+        this.buffer.set(this.buffer.slice(length, this.cursor));
+        this.cursor -= length;
+        debug('parse push', frame, this.buffer, this.cursor);
+        this.push(frame);
       }
       cb();
     }
@@ -67,6 +64,7 @@ var ccTalkParser = (_dec = nonew(), _dec(_class = function (_Transform) {
   return ccTalkParser;
 }(Transform)) || _class);
 ;
+
 exports.default = ccTalkParser;
 
 module.exports = ccTalkParser;

@@ -1,7 +1,7 @@
 const Buffer = require('safe-buffer').Buffer;
 const Transform = require('stream').Transform;
 const MAX_PACKET_LENGTH = 255 + 5;
-
+const debug = require('debug')
 const nonew = require('class-nonew-decorator');
 
 @nonew()
@@ -12,12 +12,12 @@ class ccTalkParser extends Transform {
     this.cursor = 0;
   }
   _transform(buffer, _, cb) {
-     debug('parser set',this.buffer, buffer ,this.cursor)
-     debug('parser set',this.buffer.toString('hex'), buffer.buffer ,this.cursor)
+     debug('parser set')(this.buffer, buffer ,this.cursor)
+     debug('parser set')(this.buffer.toString('hex'), buffer.buffer ,this.cursor)
 
      this.buffer.set(buffer, this.cursor);
      this.cursor += buffer.length;
-     debug('parse befor loop',buffer, this.cursor)
+     debug('parse befor loop')(buffer, this.cursor)
      while(this.cursor > 1 && this.cursor >= this.buffer[1] + 5) {
        // full frame accumulated
        var length = this.buffer[1] + 5;

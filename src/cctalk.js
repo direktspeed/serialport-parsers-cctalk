@@ -12,8 +12,7 @@ class ccTalkParser extends Transform {
     this.cursor = 0;
   }
   _transform(buffer, _, cb) {
-     debug('parser set')(this.buffer, buffer ,this.cursor)
-     debug('parser set')(this.buffer.toString('hex'), buffer.buffer ,this.cursor)
+     debug('serialport-parsers-cctalk::setAt')(this.cursor)
 
      this.buffer.set(buffer, this.cursor);
      this.cursor += buffer.length;
@@ -30,7 +29,7 @@ class ccTalkParser extends Transform {
        // copy remaining buffer to the begin of the buffer to prepare for next command
        this.buffer.set(this.buffer.slice(length, this.cursor));
        this.cursor -= length;
-       debug('parse push',frame,this.buffer,this.cursor)
+       debug('serialport-parsers-cctalk::push')(frame,this.cursor)
        this.push(frame);
     }
     cb();

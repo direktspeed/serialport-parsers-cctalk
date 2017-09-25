@@ -1,40 +1,37 @@
 const Buffer = require('safe-buffer').Buffer;
 const Transform = require('stream').Transform;
-const MAX_PACKET_LENGTH = 255 + 5;
 const debug = require('debug')
 const nonew = require('class-nonew-decorator');
 
 @nonew()
-class ccTalkParser extends Transform {
+class CCTalkParser extends Transform {
   constructor() {
-    super();  
-    this.buffer = Buffer.alloc(MAX_PACKET_LENGTH); // maxium ccTalkMessage length
+    super();
+    this.array = [];
     this.cursor = 0;
   }
   _transform(buffer, _, cb) {
-     debug('serialport-parsers-cctalk::setAt')(this.cursor)
+    this.cursor += buffer.length;
+    
+    const array = [...buffer];
+    // TODO: ES7 allows directly push
+    array.map((byte) => this.array.push(byte)); 
 
-     this.buffer.set(buffer, this.cursor);
-     this.cursor += buffer.length;
-     debug('parse befor loop')(buffer, this.cursor)
-     while(this.cursor > 1 && this.cursor >= this.buffer[1] + 5) {
-       // full frame accumulated
-       var length = this.buffer[1] + 5;
-       //console.log("length", length);
+    while (this.cursor > 1 && this.cursor >= this.array[1] + 5) {
+      // full frame accumulated
+      // copy command from the array
+      const FullMsgLength = this.array[1] + 5;
+      const frame = new Uint8Array(FullMsgLength);
+      frame.set(this.array.slice(0, FullMsgLength));
 
-       //copy command from the buffer
-       var frame = new Uint8Array(length);
-       frame.set(this.buffer.slice(0, length));
-
-       // copy remaining buffer to the begin of the buffer to prepare for next command
-       this.buffer.set(this.buffer.slice(length, this.cursor));
-       this.cursor -= length;
-       debug('serialport-parsers-cctalk::push')(frame,this.cursor)
-       this.push(frame);
+      // Preserve Extra Data
+      this.array = this.array.slice(frame.length, this.array.length);
+      this.cursor -= FullMsgLength;
+      this.push(frame);
     }
     cb();
   }
 };
 
-export default ccTalkParser;
-module.exports = ccTalkParser;
+export default CCTalkParser;
+module.exports = CCTalkParser;

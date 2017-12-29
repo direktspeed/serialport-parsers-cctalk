@@ -27,7 +27,7 @@
     "babel-preset-stage-0": "6.24.1",
     "babel-polyfill": "6.26.0",
     "debug": "3.1.0",
-    "mocha": "3.5.3"
+    "mocha": "4.1.0"
   },
   "dependencies": {
     "class-nonew-decorator": "^1.0.6"
